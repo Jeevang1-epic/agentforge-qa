@@ -1,0 +1,9 @@
+{
+  "name": "agentforge-node-basic-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test/smoke.test.js"
+  }
+}

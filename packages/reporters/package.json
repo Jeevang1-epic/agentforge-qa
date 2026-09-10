@@ -1,0 +1,47 @@
+{
+  "name": "@agentforge-qa/reporters",
+  "version": "0.2.0",
+  "description": "AgentForge QA report rendering foundation.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jeevang1-epic/agentforge-qa.git",
+    "directory": "packages/reporters"
+  },
+  "bugs": {
+    "url": "https://github.com/Jeevang1-epic/agentforge-qa/issues"
+  },
+  "homepage": "https://github.com/Jeevang1-epic/agentforge-qa#readme",
+  "keywords": [
+    "agentforge",
+    "qa",
+    "reporting",
+    "verification",
+    "local-first"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run --root ../.. packages/reporters/src/index.test.ts",
+    "lint": "eslint --config ../../eslint.config.js src"
+  },
+  "dependencies": {
+    "@agentforge-qa/schemas": "0.2.0"
+  }
+}

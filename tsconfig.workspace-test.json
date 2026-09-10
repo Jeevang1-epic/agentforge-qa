@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@agentforge-qa/schemas": ["packages/schemas/src/index.ts"],
+      "@agentforge-qa/core": ["packages/core/src/index.ts"],
+      "@agentforge-qa/reporters": ["packages/reporters/src/index.ts"],
+      "@agentforge-qa/testkit": ["packages/testkit/src/index.ts"]
+    }
+  }
+}

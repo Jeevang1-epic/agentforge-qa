@@ -1,0 +1,42 @@
+{
+  "name": "@agentforge-qa/workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workspace for the AgentForge QA local-first CLI.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.11.0",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "esbuild"
+    ],
+    "overrides": {
+      "brace-expansion@<1.1.18": "1.1.18",
+      "brace-expansion@>=3.0.0 <5.0.9": "5.0.9",
+      "js-yaml@>=4.0.0 <4.3.2": "4.3.2",
+      "esbuild": "0.28.1",
+      "nanoid@<3.3.18": "3.3.18",
+      "postcss@<=8.5.22": "8.5.23"
+    }
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "pretypecheck": "pnpm run build",
+    "typecheck": "pnpm -r typecheck",
+    "pretest": "pnpm run build",
+    "test": "pnpm -r test && vitest run tests/e2e",
+    "lint": "pnpm -r lint && eslint tests/e2e",
+    "smoke": "pnpm --filter agentforge-qa smoke"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/node": "^22.15.29",
+    "eslint": "^9.28.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.0",
+    "vitest": "^4.1.11"
+  }
+}

@@ -1,0 +1,4 @@
+Node basic example summary artifact.
+
+This fixture demonstrates a local source file, a deterministic claim file, and
+a committed artifact that can be checked without network access.

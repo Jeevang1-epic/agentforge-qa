@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "0.1.0",
+  "commands": [],
+  "artifacts": [
+    {
+      "id": "demo-summary",
+      "label": "Demo summary artifact",
+      "path": "examples/demo-blocked/artifacts/demo-summary.txt",
+      "type": "file",
+      "required": true,
+      "demoCritical": true,
+      "claimKeywords": ["demo summary"]
+    }
+  ]
+}

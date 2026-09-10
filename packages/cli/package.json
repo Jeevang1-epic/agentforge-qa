@@ -1,0 +1,50 @@
+{
+  "name": "agentforge-qa",
+  "version": "0.2.0",
+  "description": "Local-first CLI for verifying AI coding-agent work.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jeevang1-epic/agentforge-qa.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Jeevang1-epic/agentforge-qa/issues"
+  },
+  "homepage": "https://github.com/Jeevang1-epic/agentforge-qa#readme",
+  "keywords": [
+    "agentforge",
+    "qa",
+    "cli",
+    "verification",
+    "local-first"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "bin": {
+    "agentforge-qa": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run --root ../.. packages/cli/src/index.test.ts",
+    "lint": "eslint --config ../../eslint.config.js src",
+    "smoke": "node dist/index.js --help && node dist/index.js --version && node dist/index.js verify --help && node dist/index.js verify --format json --exit-zero"
+  },
+  "dependencies": {
+    "@agentforge-qa/core": "0.2.0",
+    "@agentforge-qa/reporters": "0.2.0",
+    "@agentforge-qa/schemas": "0.2.0"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.workspace-test.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"]
+}

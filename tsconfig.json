@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/schemas"
+    },
+    {
+      "path": "./packages/core"
+    },
+    {
+      "path": "./packages/reporters"
+    },
+    {
+      "path": "./packages/cli"
+    },
+    {
+      "path": "./packages/testkit"
+    }
+  ]
+}

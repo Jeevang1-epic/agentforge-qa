@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "0.1.0",
+  "commands": [
+    {
+      "id": "node-basic-smoke",
+      "label": "Run node-basic smoke test",
+      "command": "node",
+      "args": ["examples/node-basic/test/smoke.test.js"],
+      "required": false,
+      "timeoutMs": 10000
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "node-basic-summary",
+      "label": "Node basic summary artifact",
+      "path": "examples/node-basic/artifacts/summary.txt",
+      "type": "file",
+      "required": true,
+      "claimKeywords": ["summary artifact", "node basic summary"]
+    },
+    {
+      "id": "node-basic-source",
+      "label": "Node basic source file",
+      "path": "examples/node-basic/src/index.js",
+      "type": "file",
+      "required": true,
+      "claimKeywords": ["source file", "greeting helper"]
+    }
+  ]
+}

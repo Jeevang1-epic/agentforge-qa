@@ -1,0 +1,47 @@
+{
+  "name": "@agentforge-qa/schemas",
+  "version": "0.2.0",
+  "description": "Shared AgentForge QA schemas and validators.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jeevang1-epic/agentforge-qa.git",
+    "directory": "packages/schemas"
+  },
+  "bugs": {
+    "url": "https://github.com/Jeevang1-epic/agentforge-qa/issues"
+  },
+  "homepage": "https://github.com/Jeevang1-epic/agentforge-qa#readme",
+  "keywords": [
+    "agentforge",
+    "qa",
+    "schemas",
+    "verification",
+    "local-first"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run --root ../.. packages/schemas/src",
+    "lint": "eslint --config ../../eslint.config.js src"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}
