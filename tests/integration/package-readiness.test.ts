@@ -331,8 +331,8 @@ describe("package readiness guardrails", () => {
 
     expect(manifest.pnpm?.ignoredBuiltDependencies).toEqual(["esbuild"]);
     expect(manifest.pnpm?.overrides).toEqual({
-      "brace-expansion@<1.1.18": "1.1.18",
-      "brace-expansion@>=3.0.0 <5.0.9": "5.0.9",
+      "brace-expansion@<1.1.21": "1.1.21",
+      "brace-expansion@>=3.0.0 <5.0.12": "5.0.12",
       esbuild: "0.28.1",
       "js-yaml@>=4.0.0 <4.3.2": "4.3.2",
       "nanoid@<3.3.18": "3.3.18",
