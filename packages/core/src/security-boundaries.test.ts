@@ -70,7 +70,10 @@ describe("@agentforge-qa/core security and package boundaries", () => {
         expect.stringMatching(/git[\\/]collect-git-evidence\.ts$/),
       ]),
     );
-    expect(fileSystemSources).toHaveLength(8);
+    expect(fileSystemSources).toHaveLength(9);
+    expect(fileSystemSources.map(({ file }) => file)).toContainEqual(
+      expect.stringMatching(/scanners[\\/]failure-suppression[\\/]scan\.ts$/),
+    );
   });
 
   it("does not contain shell execution, exec calls, or unrelated unsafe access", () => {
