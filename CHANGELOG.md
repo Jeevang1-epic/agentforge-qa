@@ -1,6 +1,18 @@
 # Changelog
 
-## 0.2.0 - Unreleased
+## 0.3.0 - Unreleased
+
+- Added automatic, local failure-suppression evidence for changed JavaScript,
+  TypeScript, JSX, TSX, Python, and eligible untracked source.
+- Correlated changed suppression comments with structural error paths; added
+  informational commit-message signals for safe reference comparisons.
+- Routed normalized scanner findings through existing risks and conservative
+  review verdicts without changing the 0.1.0 configuration/report schema.
+- Bounded source and Git input, preserved repository containment, and kept
+  scanner source/message capture in memory.
+- Prepared the four runtime packages and their internal dependencies for 0.3.0.
+
+## 0.2.0 - 2026-08-03
 
 - Added one canonical decision summary shared by Markdown, JSON, and future
   integrations.
