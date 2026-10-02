@@ -48,13 +48,19 @@ Changed comments in the same diff hunk can strengthen a structural finding.
 Comment or commit language alone is informational and adds no risk score.
 Source string literals and identifiers are not language evidence.
 
-High-confidence empty or swallowed handlers and successful-looking error
-returns require review. Ordinary default returns are warnings; correlation
-with a changed suppression comment also requires review. These findings alone
-produce at most `NEEDS_REVIEW`. Independent failed checks or missing artifacts
-retain their existing stronger verdicts.
+Structural failure-suppression findings, including default fallbacks in changed
+error paths, require review. Correlated suppression language increases
+confidence and context. Language-only findings remain informational and
+non-blocking. These findings alone produce at most `NEEDS_REVIEW`; they do not
+prove a bug. Independent failed checks or missing artifacts retain their
+existing stronger verdicts.
 
 The scanner uses no LLM, API, network access, or execution of scanned code.
+It does not modify source files or change Git refs, the index, commits, or
+working-tree source. Scanner source and commit-message captures are kept in
+memory and are not persisted. Normal Git evidence collection may write
+operational logs beneath `.agentforge/logs/git`; verification is not wholly
+filesystem-write-free.
 It is a bounded heuristic, not a full parser or SAST/security review. False
 positives and missed patterns are possible. A finding is evidence for human
 review, not proof of a vulnerability or malicious intent. Unsupported languages,

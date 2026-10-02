@@ -52,8 +52,9 @@ afterEach(async () => {
 describe("built failure suppression CLI", () => {
   it.each([
     ["clean change", "export const changed = 2;", "SAFE_TO_CONTINUE", undefined],
+    ["language-only comment", "// fallback", "SAFE_TO_CONTINUE", "AFQ-FS005"],
     ["empty catch", "try {} catch {}", "NEEDS_REVIEW", "AFQ-FS001"],
-    ["default fallback", "try {} catch { return []; }", "SAFE_TO_CONTINUE", "AFQ-FS002"],
+    ["default fallback", "try {} catch { return []; }", "NEEDS_REVIEW", "AFQ-FS002"],
     ["correlated comment", "// gracefully fallback rather than failing\ntry {} catch { return []; }", "NEEDS_REVIEW", "AFQ-FS002"],
     ["permissive return", "try {} catch { return true; }", "NEEDS_REVIEW", "AFQ-FS003"],
     ["untracked promise", "promise.catch(() => {})", "NEEDS_REVIEW", "AFQ-FS004"],

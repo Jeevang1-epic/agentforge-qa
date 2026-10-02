@@ -163,11 +163,11 @@ describe("scanner risk policy", () => {
     expect(calculateRiskScore(risks("// fallback")).score).toBe(0);
     expect(verdict("// fallback")).toBe("SAFE_TO_CONTINUE");
   });
-  it("keeps uncorrelated defaults nonblocking and raises correlated defaults to review", () => {
-    expect(verdict("try {} catch { return []; }")).toBe("SAFE_TO_CONTINUE");
+  it("requires review for uncorrelated and correlated structural defaults", () => {
+    expect(verdict("try {} catch { return []; }")).toBe("NEEDS_REVIEW");
     expect(verdict("// fallback\ntry {} catch { return []; }")).toBe("NEEDS_REVIEW");
   });
-  it.each(["try {} catch {}", "promise.catch(() => {})", "try {} catch { return true; }"])("requires review without unsafe/demo verdict for %s", (source) => {
+  it.each(["try {} catch {}", "try {} catch { return []; }", "promise.catch(() => {})", "try {} catch { return true; }"])("requires review without unsafe/demo verdict for %s", (source) => {
     expect(verdict(source)).toBe("NEEDS_REVIEW");
   });
   it("makes partial scans blocking warnings", () => {

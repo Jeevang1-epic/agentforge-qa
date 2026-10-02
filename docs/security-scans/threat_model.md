@@ -132,6 +132,10 @@ attacker-controlled. The scanner never imports, evaluates, executes, or sends
 them to a service. It reuses the reviewed command runner with shell disabled,
 fsmonitor disabled, optional locks disabled, and capture-only operation:
 scanner baseline source and message bodies are not written to command logs.
+The scanner does not modify source files or change Git refs, the index,
+commits, or working-tree source. Normal AgentForge QA Git evidence collection
+may write operational logs beneath `.agentforge/logs/git`; verification is not
+filesystem-write-free.
 Source comparisons use raw blobs and an in-memory line diff. No working-tree
 diff is invoked. Git status first reads bounded filter-key metadata and
 disables each configured clean/smudge/process driver with empty-command

@@ -14,7 +14,7 @@ const titles = {
 export function failureSuppressionRisks(scan: ScanResult, evidenceId: string): RiskFinding[] {
   const risks: RiskFinding[] = scan.signals.map((signal, index) => {
     const languageOnly = signal.ruleId === "AFQ-FS005";
-    const blocksVerdict = !languageOnly && (signal.ruleId !== "AFQ-FS002" || signal.correlated);
+    const blocksVerdict = !languageOnly;
     const location = redactCommandText(signal.path).replace(/[\x00-\x1f\x7f]/g, "?").slice(0, 240);
     return RiskFindingSchema.parse({
       id: `risk:failure-suppression:${index + 1}`,

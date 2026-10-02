@@ -63,6 +63,7 @@ AFQ-FS003 (success return), AFQ-FS004 (swallowed promise failure), and AFQ-FS005
 
 Only changed comments in the same computed change hunk strengthen a structural signal.
 Commit messages are informational because they cannot reliably be attributed
-to a specific surviving handler. Structural findings use warning severity;
-language-only findings use info severity and score zero. Scanner evidence does
-not change the verdict engine or schema version 0.1.0.
+to a specific surviving handler. All structural findings, including default
+returns, use warning severity and require `NEEDS_REVIEW`; correlated language
+adds context but is not required. Language-only findings use info severity and
+score zero. Scanner evidence does not change the schema version 0.1.0.
