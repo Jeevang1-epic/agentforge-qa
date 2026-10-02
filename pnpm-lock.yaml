@@ -38,25 +38,25 @@ importers:
   packages/cli:
     dependencies:
       '@agentforge-qa/core':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../core
       '@agentforge-qa/reporters':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../reporters
       '@agentforge-qa/schemas':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../schemas
 
   packages/core:
     dependencies:
       '@agentforge-qa/schemas':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../schemas
 
   packages/reporters:
     dependencies:
       '@agentforge-qa/schemas':
-        specifier: 0.2.0
+        specifier: 0.3.0
         version: link:../schemas
 
   packages/schemas:

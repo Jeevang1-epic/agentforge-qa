@@ -7,7 +7,7 @@ import { runVerification } from "@agentforge-qa/core";
 import { renderReport, type ReportFormat } from "@agentforge-qa/reporters";
 import type { VerificationReport, VerificationRequest } from "@agentforge-qa/schemas";
 
-export const CLI_VERSION = "0.2.0";
+export const CLI_VERSION = "0.3.0";
 
 export const CLI_HELP = `AgentForge QA ${CLI_VERSION}
 
