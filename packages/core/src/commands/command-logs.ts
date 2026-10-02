@@ -16,6 +16,7 @@ export const MAX_CAPTURE_BYTES = 5_000_000;
 
 export interface OutputCollector {
   append(chunk: Uint8Array | string): void;
+  isTruncated(): boolean;
   toString(): string;
 }
 
@@ -78,6 +79,9 @@ export function createOutputCollector(
       chunks.push(capturedChunk);
       capturedBytes += capturedChunk.length;
       truncated ||= capturedChunk.length < buffer.length;
+    },
+    isTruncated(): boolean {
+      return truncated;
     },
     toString(): string {
       const output = Buffer.concat(chunks).toString("utf8");

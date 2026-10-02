@@ -26,9 +26,11 @@ import { resolveKillGraceMs } from "./command-timeouts.js";
 export interface CommandRunOptions extends CommandSafetyOptions, CommandLogOptions {
   dryRun?: boolean;
   killGraceMs?: number;
+  persistLogs?: boolean;
 }
 
 export interface CommandExecution {
+  stdoutTruncated?: boolean;
   result: CommandResult;
   stderr: string;
   stdout: string;
@@ -153,7 +155,9 @@ async function executeApprovedCommand(
       );
     }
 
-    const logDirectoryReview = await reviewCommandLogDirectory(options);
+    const logDirectoryReview = options.persistLogs === false
+      ? { approved: true, code: "APPROVED", reason: "In-memory capture only." }
+      : await reviewCommandLogDirectory(options);
 
     if (!logDirectoryReview.approved) {
       return createSkippedExecution(
@@ -168,7 +172,12 @@ async function executeApprovedCommand(
         : review.normalizedCommand;
     const child = spawn(executable, review.normalizedArgs, {
       cwd: cwdReview.path,
-      env: createCommandEnvironment(),
+      env: {
+        ...createCommandEnvironment(),
+        ...(normalizeCommandName(review.normalizedCommand) === "git"
+          ? { GIT_NO_LAZY_FETCH: "1", GIT_TERMINAL_PROMPT: "0" }
+          : {}),
+      },
       shell: false,
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
@@ -217,7 +226,7 @@ async function executeApprovedCommand(
     const finishedAtMs = Date.now();
     const capturedStdout = stdout.toString();
     const capturedStderr = stderr.toString();
-    const logPaths = await writeCommandLogs(
+    const logPaths = options.persistLogs === false ? {} : await writeCommandLogs(
       plan.id,
       startedAt,
       capturedStdout,
@@ -236,6 +245,7 @@ async function executeApprovedCommand(
         ),
         stderr: capturedStderr,
         stdout: capturedStdout,
+        stdoutTruncated: stdout.isTruncated(),
       };
     }
 
@@ -263,12 +273,14 @@ async function executeApprovedCommand(
       }),
       stderr: capturedStderr,
       stdout: capturedStdout,
+      stdoutTruncated: stdout.isTruncated(),
     };
   } catch (error) {
     return {
       result: createErrorResult(plan, startedAt, startedAtMs, error),
       stderr: stderr.toString(),
       stdout: stdout.toString(),
+      stdoutTruncated: stdout.isTruncated(),
     };
   }
 }
