@@ -1,6 +1,6 @@
 {
   "name": "agentforge-qa",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Local-first CLI for verifying AI coding-agent work.",
   "type": "module",
   "license": "MIT",
@@ -43,8 +43,8 @@
     "smoke": "node dist/index.js --help && node dist/index.js --version && node dist/index.js verify --help && node dist/index.js verify --format json --exit-zero"
   },
   "dependencies": {
-    "@agentforge-qa/core": "0.2.0",
-    "@agentforge-qa/reporters": "0.2.0",
-    "@agentforge-qa/schemas": "0.2.0"
+    "@agentforge-qa/core": "0.3.0",
+    "@agentforge-qa/reporters": "0.3.0",
+    "@agentforge-qa/schemas": "0.3.0"
   }
 }

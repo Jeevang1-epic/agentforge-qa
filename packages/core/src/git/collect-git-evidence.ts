@@ -11,6 +11,7 @@ import {
 
 import { runCommandPlanWithOutput } from "../commands/command-runner.js";
 import { createGitEvidenceId } from "../evidence/evidence-ids.js";
+import { filterSafetyArguments } from "./filter-safety.js";
 
 const dependencyFileNames = new Set([
   "package.json",
@@ -21,7 +22,6 @@ const dependencyFileNames = new Set([
   "yarn.lock",
 ]);
 const MAX_GIT_CAPTURE_BYTES = 5_000_000;
-const OUTPUT_TRUNCATED_MARKER = "[OUTPUT TRUNCATED]";
 const GIT_SAFETY_ARGS = [
   "-c",
   "core.fsmonitor=false",
@@ -32,14 +32,18 @@ export interface CollectedGitEvidence {
   evidence: GitEvidence;
   evidenceId: string;
   status: "collected" | "error" | "not_git_repo";
+  filterSafetyArgs?: string[];
+  renamedPaths?: Map<string, string>;
 }
 
 interface GitCommandOutput {
+  truncated: boolean;
   output: string;
   result: CommandResult;
 }
 
 interface ParsedGitPaths {
+  renamedPaths: Map<string, string>;
   changedFiles: Set<string>;
   deletedFiles: Set<string>;
   untrackedFiles: Set<string>;
@@ -52,17 +56,19 @@ function nextGitPlanId(label: string): string {
   return `git-${label}-${Date.now()}-${gitCommandSequence}`;
 }
 
-async function runGitEvidenceCommand(
+export async function runGitEvidenceCommand(
   repoRoot: string,
   label: string,
   args: string[],
+  persistLogs = true,
+  filterSafetyArgs: string[] = [],
 ): Promise<GitCommandOutput> {
   const execution = await runCommandPlanWithOutput(
     CommandPlanSchema.parse({
       id: nextGitPlanId(label),
       label: `Collect git ${label} evidence`,
       command: "git",
-      args: [...GIT_SAFETY_ARGS, ...args],
+      args: [...GIT_SAFETY_ARGS, ...filterSafetyArgs, ...args],
       required: false,
       timeoutMs: 10_000,
       cwd: repoRoot,
@@ -71,11 +77,13 @@ async function runGitEvidenceCommand(
       repoRoot,
       logDirectory: ".agentforge/logs/git",
       maxCaptureBytes: MAX_GIT_CAPTURE_BYTES,
+      persistLogs,
     },
   );
 
   return {
     output: execution.stdout,
+    truncated: execution.stdoutTruncated === true,
     result: execution.result,
   };
 }
@@ -108,6 +116,7 @@ function addChangedPath(paths: ParsedGitPaths, path: string): void {
 
 export function parseStatusPorcelainZ(output: string): ParsedGitPaths {
   const paths: ParsedGitPaths = {
+    renamedPaths: new Map(),
     changedFiles: new Set<string>(),
     deletedFiles: new Set<string>(),
     untrackedFiles: new Set<string>(),
@@ -145,6 +154,9 @@ export function parseStatusPorcelainZ(output: string): ParsedGitPaths {
       }
 
       addChangedPath(paths, originalPath);
+      if (status.includes("R")) {
+        paths.renamedPaths.set(path, originalPath);
+      }
       index += 1;
     }
   }
@@ -154,6 +166,7 @@ export function parseStatusPorcelainZ(output: string): ParsedGitPaths {
 
 export function parseNameStatusZ(output: string): ParsedGitPaths {
   const paths: ParsedGitPaths = {
+    renamedPaths: new Map(),
     changedFiles: new Set<string>(),
     deletedFiles: new Set<string>(),
     untrackedFiles: new Set<string>(),
@@ -182,6 +195,9 @@ export function parseNameStatusZ(output: string): ParsedGitPaths {
       }
 
       addChangedPath(paths, renamedPath);
+      if (status.startsWith("R")) {
+        paths.renamedPaths.set(renamedPath, path);
+      }
       index += 1;
     }
   }
@@ -190,6 +206,9 @@ export function parseNameStatusZ(output: string): ParsedGitPaths {
 }
 
 function mergeGitPaths(target: ParsedGitPaths, source: ParsedGitPaths): void {
+  for (const [path, original] of source.renamedPaths) {
+    target.renamedPaths.set(path, original);
+  }
   for (const path of source.changedFiles) {
     target.changedFiles.add(path);
   }
@@ -243,10 +262,6 @@ function commandFailureSummary(label: string, output: GitCommandOutput): string 
   return `${label} could not be collected: ${output.result.reason ?? output.result.status}.`;
 }
 
-function outputWasTruncated(output: string): boolean {
-  return output.includes(OUTPUT_TRUNCATED_MARKER);
-}
-
 async function gitTopLevelMatchesRepoRoot(
   repoRoot: string,
   reportedTopLevel: string,
@@ -269,6 +284,7 @@ export async function collectGitEvidence(
 ): Promise<CollectedGitEvidence> {
   const evidenceId = createGitEvidenceId("status");
   const paths: ParsedGitPaths = {
+    renamedPaths: new Map(),
     changedFiles: new Set<string>(),
     deletedFiles: new Set<string>(),
     untrackedFiles: new Set<string>(),
@@ -308,7 +324,7 @@ export async function collectGitEvidence(
     "--show-toplevel",
   ]);
 
-  if (topLevel.result.status !== "passed" || outputWasTruncated(topLevel.output)) {
+  if (topLevel.result.status !== "passed" || topLevel.truncated) {
     return createErrorEvidence(
       since,
       paths,
@@ -331,14 +347,27 @@ export async function collectGitEvidence(
     );
   }
 
+  let filterSafetyArgs: string[];
+  try {
+    const filters = await runGitEvidenceCommand(repo.root, "filter-metadata", [
+      "config", "--null", "--name-only", "--get-regexp", "filter[.]",
+    ], false);
+    if ((filters.result.status !== "passed" &&
+      !(filters.result.status === "failed" && filters.result.exitCode === 1)) ||
+      filters.truncated) throw new Error("Filter metadata unavailable.");
+    filterSafetyArgs = filterSafetyArguments(filters.output);
+  } catch {
+    return createErrorEvidence(since, paths, evidenceId, "Git filter safety metadata could not be collected.");
+  }
+
   const statusOutput = await runGitEvidenceCommand(repo.root, "status", [
     "status",
     "--porcelain=v1",
     "-z",
     "--untracked-files=all",
-  ]);
+  ], true, filterSafetyArgs);
 
-  if (statusOutput.result.status !== "passed" || outputWasTruncated(statusOutput.output)) {
+  if (statusOutput.result.status !== "passed" || statusOutput.truncated) {
     return createErrorEvidence(
       since,
       paths,
@@ -361,12 +390,15 @@ export async function collectGitEvidence(
   if (since !== undefined) {
     const diffOutput = await runGitEvidenceCommand(repo.root, "diff", [
       "diff",
+      "--no-ext-diff",
+      "--no-textconv",
       "--name-status",
       "-z",
       since,
+      "HEAD",
     ]);
 
-    if (diffOutput.result.status !== "passed" || outputWasTruncated(diffOutput.output)) {
+    if (diffOutput.result.status !== "passed" || diffOutput.truncated) {
       return createErrorEvidence(
         since,
         paths,
@@ -395,5 +427,7 @@ export async function collectGitEvidence(
     ),
     evidenceId,
     status: "collected",
+    filterSafetyArgs,
+    renamedPaths: paths.renamedPaths,
   };
 }

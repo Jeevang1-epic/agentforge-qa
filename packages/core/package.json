@@ -1,6 +1,6 @@
 {
   "name": "@agentforge-qa/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "AgentForge QA verification orchestration foundation.",
   "type": "module",
   "license": "MIT",
@@ -41,6 +41,6 @@
     "lint": "eslint --config ../../eslint.config.js src"
   },
   "dependencies": {
-    "@agentforge-qa/schemas": "0.2.0"
+    "@agentforge-qa/schemas": "0.3.0"
   }
 }

@@ -274,6 +274,6 @@ describe("workspace package boundaries", () => {
     }
 
     expect(cliManifest?.bin?.["agentforge-qa"]).toBe("./dist/index.js");
-    expect(cliSource.startsWith("#!/usr/bin/env node\n")).toBe(true);
+    expect(cliSource.replaceAll("\r\n", "\n").startsWith("#!/usr/bin/env node\n")).toBe(true);
   });
 });

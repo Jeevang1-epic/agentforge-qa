@@ -23,6 +23,7 @@ import {
 } from "../errors/pipeline-errors.js";
 import { collectGitEvidence } from "../git/collect-git-evidence.js";
 import { assessRisks } from "../risk/assess-risks.js";
+import { scanFailureSuppression } from "../scanners/failure-suppression/scan.js";
 import { calculateRiskScore } from "../risk/calculate-risk-score.js";
 import { determineVerdict } from "../verdict/determine-verdict.js";
 import { buildDecisionSummary } from "../summary/build-decision-summary.js";
@@ -97,6 +98,7 @@ export async function runVerification(
     const repo = await detectRepo(verifiedRequest.cwd);
     const loadedConfig = await loadConfig(repo.root, verifiedRequest.configPath);
     const git = await collectGitEvidence(repo, verifiedRequest.since);
+    const failureSuppression = await scanFailureSuppression(repo.root, git, verifiedRequest.since);
     const commandPlans = planCommands(loadedConfig.config.commands, repo.root);
     const commands = await runConfiguredCommands(commandPlans, {
       repoRoot: repo.root,
@@ -119,6 +121,7 @@ export async function runVerification(
       commandResults: commands,
       config: loadedConfig.config,
       git,
+      failureSuppression,
       repo,
     });
     const riskScore = calculateRiskScore(risks);

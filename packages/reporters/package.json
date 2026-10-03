@@ -1,6 +1,6 @@
 {
   "name": "@agentforge-qa/reporters",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "AgentForge QA report rendering foundation.",
   "type": "module",
   "license": "MIT",
@@ -42,6 +42,6 @@
     "lint": "eslint --config ../../eslint.config.js src"
   },
   "dependencies": {
-    "@agentforge-qa/schemas": "0.2.0"
+    "@agentforge-qa/schemas": "0.3.0"
   }
 }

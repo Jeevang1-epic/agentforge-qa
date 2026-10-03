@@ -2,7 +2,7 @@
 
 ## Overview
 
-AgentForge QA is an early v0.1 local-first TypeScript CLI and library workspace
+AgentForge QA is a local-first TypeScript CLI and library workspace
 for collecting evidence about AI coding-agent work before a developer trusts,
 pushes, demos, or ships it. The implemented runtime surface is primarily
 `@agentforge-qa/core`, which accepts a verification request, loads JSON
@@ -124,6 +124,52 @@ There is no server, authentication system, browser UI, database, multi-tenant
 boundary, hosted API, or network client in the current product runtime. Web
 classes such as CSRF, XSS, SSRF, tenant isolation, and session fixation are
 therefore not applicable unless future features introduce those surfaces.
+
+### Failure suppression scanner (0.3.0 development)
+
+Source contents, changed filenames, diff hunks, and commit messages are
+attacker-controlled. The scanner never imports, evaluates, executes, or sends
+them to a service. It reuses the reviewed command runner with shell disabled,
+fsmonitor disabled, optional locks disabled, and capture-only operation:
+scanner baseline source and message bodies are not written to command logs.
+The scanner does not modify source files or change Git refs, the index,
+commits, or working-tree source. Normal AgentForge QA Git evidence collection
+may write operational logs beneath `.agentforge/logs/git`; verification is not
+filesystem-write-free.
+Source comparisons use raw blobs and an in-memory line diff. No working-tree
+diff is invoked. Git status first reads bounded filter-key metadata and
+disables each configured clean/smudge/process driver with empty-command
+overrides and required=false. At most 100 simply named filter drivers are
+accepted; unknown/malformed metadata fails closed. Committed-tree name-status
+diffs explicitly disable external diff and textconv. Git log
+uses a fixed format, no signature verification, and a fixed message-count cap.
+Only exact metadata/tree/blob/log forms and validated references pass command
+policy; tree paths use literal pathspecs after the option separator. Git
+processes disable lazy fetching and interactive credential requests.
+
+Limits are 200 eligible files, 256 KiB per file, 2 MiB aggregate source,
+5,000,000 bytes aggregate Git source/message capture, 100 commit messages (one
+extra is requested to detect overflow), 60,000 tokens per file, 128 delimiter levels,
+and 500 findings. Line comparison has a 250,000-step budget; source-byte
+limits include baseline and working content. Individual Git commands retain a
+10-second timeout and a 5,000,000-byte capture ceiling. Source reads use a fixed maximum buffer after
+canonical repository containment and regular-file checks. Binary/NUL, invalid
+UTF-8, excessive sizes, unreadable paths, malformed lexical input, truncated
+Git output, and limit exhaustion produce blocking partial-verification warnings.
+Redirected source paths, including in-repository symlinks, are conservatively
+skipped because their diff line locations may refer to different content.
+Known generated directories, declaration/minified/generated filenames, and
+files explicitly marked @generated in an initial comment are excluded.
+
+Locations are normalized and redacted before risk rendering; source snippets
+and raw commit messages are omitted. Reporters retain Markdown escaping.
+No new public report fields or risk categories are introduced.
+
+Residual risks include concurrent filesystem changes between path validation
+and open, source snapshots changing during Git comparison, disguised generated
+content, incomplete language syntax coverage, and heuristic false positives/
+negatives. This scanner adds review evidence; it cannot establish developer
+intent, prove correctness, or replace comprehensive security analysis.
 
 ## Severity Calibration (Critical, High, Medium, Low)
 

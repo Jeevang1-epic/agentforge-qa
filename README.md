@@ -30,6 +30,45 @@ npm install --save-dev agentforge-qa
 
 The current public release is `agentforge-qa@0.2.0`.
 
+The development workspace is preparing `0.3.0`; the scanner described below is
+not included in the published `0.2.0` package.
+
+## Failure Suppression Scanner (Development)
+
+The upcoming `0.3.0` CLI automatically checks changed work for possible silent
+failure handling. It examines changed handlers in JavaScript, TypeScript, JSX,
+TSX, and Python, plus eligible untracked source files. With `--since <ref>`,
+it compares the working tree against that safe reference and checks commit
+messages between the reference and HEAD. Without it, tracked changes are
+compared with HEAD. Existing unchanged handlers are not scanned for findings.
+
+Deterministic local rules detect empty handlers, swallowed promise errors,
+failure-to-default returns, and successful-looking returns after errors.
+Changed comments in the same diff hunk can strengthen a structural finding.
+Comment or commit language alone is informational and adds no risk score.
+Source string literals and identifiers are not language evidence.
+
+Structural failure-suppression findings, including default fallbacks in changed
+error paths, require review. Correlated suppression language increases
+confidence and context. Language-only findings remain informational and
+non-blocking. These findings alone produce at most `NEEDS_REVIEW`; they do not
+prove a bug. Independent failed checks or missing artifacts retain their
+existing stronger verdicts.
+
+The scanner uses no LLM, API, network access, or execution of scanned code.
+It does not modify source files or change Git refs, the index, commits, or
+working-tree source. Scanner source and commit-message captures are kept in
+memory and are not persisted. Normal Git evidence collection may write
+operational logs beneath `.agentforge/logs/git`; verification is not wholly
+filesystem-write-free.
+It is a bounded heuristic, not a full parser or SAST/security review. False
+positives and missed patterns are possible. A finding is evidence for human
+review, not proof of a vulnerability or malicious intent. Unsupported languages,
+complex callbacks, template interpolation, and indirect control/data flow are
+outside structural coverage. Generated trees are excluded; input limits or
+unreadable eligible source prevent a safe verdict. Reports contain normalized
+rule IDs and locations, without source snippets or complete commit messages.
+
 ## Why AgentForge QA
 
 Coding agents can report that work is complete when tests were not run, required

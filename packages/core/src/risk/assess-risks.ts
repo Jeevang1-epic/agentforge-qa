@@ -10,6 +10,8 @@ import {
 
 import type { CollectedGitEvidence } from "../git/collect-git-evidence.js";
 import { createRiskEvidenceId } from "../evidence/evidence-ids.js";
+import { failureSuppressionRisks } from "./failure-suppression-risks.js";
+import type { ScanResult } from "../scanners/failure-suppression/types.js";
 
 interface RiskInputs {
   artifactResults: readonly ArtifactResult[];
@@ -18,6 +20,7 @@ interface RiskInputs {
   config: NormalizedConfig;
   git: CollectedGitEvidence;
   repo: RepoProfile;
+  failureSuppression?: ScanResult;
 }
 
 function createRisk(
@@ -186,5 +189,8 @@ export function assessRisks(inputs: RiskInputs): RiskFinding[] {
     );
   }
 
+  if (inputs.failureSuppression !== undefined) {
+    risks.push(...failureSuppressionRisks(inputs.failureSuppression, inputs.git.evidenceId));
+  }
   return RiskFindingSchema.array().parse(risks);
 }

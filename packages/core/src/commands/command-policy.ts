@@ -68,6 +68,13 @@ const deniedPackageManagerSubcommands = new Set([
   "whoami",
 ]);
 const safeGitReferencePattern = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
+export function isSafeGitReference(value: string): boolean {
+  return safeGitReferencePattern.test(value) && !value.includes("..");
+}
+
+export const SCANNER_LOG_ARGS = [
+  "log", "--format=medium", "--no-decorate", "--no-show-signature", "--max-count=101",
+] as const;
 const safeGitGlobalArgs = [
   "-c",
   "core.fsmonitor=false",
@@ -131,9 +138,13 @@ function reviewPackageManagerArgs(args: readonly string[]): CommandPolicyReview 
 function stripRequiredGitSafetyOptions(
   args: readonly string[],
 ): readonly string[] | undefined {
-  return safeGitGlobalArgs.every((value, index) => args[index] === value)
-    ? args.slice(safeGitGlobalArgs.length)
-    : undefined;
+  if (!safeGitGlobalArgs.every((value, index) => args[index] === value)) return undefined;
+  let cursor = safeGitGlobalArgs.length;
+  while (args[cursor] === "-c" &&
+    /^filter\.[A-Za-z0-9_.-]{1,100}\.(?:(?:clean|smudge|process)=|required=false)$/.test(args[cursor + 1] ?? "")) {
+    cursor += 2;
+  }
+  return args.slice(cursor);
 }
 
 function reviewGitArgs(args: readonly string[]): CommandPolicyReview {
@@ -179,6 +190,28 @@ function reviewGitArgs(args: readonly string[]): CommandPolicyReview {
 
   const usesNullDelimitedOutput = safeArgs[2] === "-z";
   const since = usesNullDelimitedOutput ? safeArgs[3] : safeArgs[2];
+
+  if (
+    (safeArgs.length === 3 && safeArgs.join(" ") === "rev-parse --verify HEAD") ||
+    (safeArgs.length === 5 && safeArgs.join(" ") === "config --null --name-only --get-regexp filter[.]") ||
+    (safeArgs.length === 6 &&
+      safeArgs[0] === "ls-tree" && safeArgs[1] === "--full-tree" && safeArgs[2] === "-z" &&
+      isSafeGitReference(safeArgs[3] ?? "") && safeArgs[4] === "--" &&
+      /^:\(literal\)[^\0\r\n]+$/.test(safeArgs[5] ?? "")) ||
+    (safeArgs.length === 3 && safeArgs[0] === "cat-file" && safeArgs[1] === "blob" &&
+      /^[a-f0-9]{40}(?:[a-f0-9]{24})?$/.test(safeArgs[2] ?? "")) ||
+    (safeArgs.length === 7 && safeArgs[0] === "diff" &&
+      safeArgs[1] === "--no-ext-diff" && safeArgs[2] === "--no-textconv" &&
+      safeArgs[3] === "--name-status" && safeArgs[4] === "-z" &&
+      isSafeGitReference(safeArgs[5] ?? "") && safeArgs[6] === "HEAD") ||
+    (safeArgs.length === SCANNER_LOG_ARGS.length + 2 &&
+      SCANNER_LOG_ARGS.every((arg, i) => safeArgs[i] === arg) &&
+      (safeArgs[SCANNER_LOG_ARGS.length] ?? "").endsWith("..HEAD") &&
+      isSafeGitReference((safeArgs[SCANNER_LOG_ARGS.length] ?? "").slice(0, -6)) &&
+      safeArgs[SCANNER_LOG_ARGS.length + 1] === "--")
+  ) {
+    return { approved: true, code: "APPROVED", reason: "Bounded read-only scanner evidence command is approved.", warnings: [] };
+  }
 
   if (
     safeArgs.length === (usesNullDelimitedOutput ? 4 : 3) &&

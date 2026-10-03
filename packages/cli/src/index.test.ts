@@ -613,7 +613,7 @@ describe("agentforge-qa local invocation readiness", () => {
     const source = await readFile(cliSourceUrl, "utf8");
 
     expect(manifest.bin?.["agentforge-qa"]).toBe("./dist/index.js");
-    expect(source.startsWith("#!/usr/bin/env node\n")).toBe(true);
+    expect(source.replaceAll("\r\n", "\n").startsWith("#!/usr/bin/env node\n")).toBe(true);
   });
 
   it("keeps the package surface limited to built output", async () => {
@@ -643,9 +643,9 @@ describe("agentforge-qa local invocation readiness", () => {
     }
 
     expect(manifest.dependencies).toEqual({
-      "@agentforge-qa/core": "0.2.0",
-      "@agentforge-qa/reporters": "0.2.0",
-      "@agentforge-qa/schemas": "0.2.0",
+      "@agentforge-qa/core": "0.3.0",
+      "@agentforge-qa/reporters": "0.3.0",
+      "@agentforge-qa/schemas": "0.3.0",
     });
     expect(manifest.devDependencies ?? {}).toEqual({});
   });

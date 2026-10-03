@@ -81,15 +81,15 @@ const expectedRuntimeDependencies = {
     zod: "^4.4.3",
   },
   "packages/core/package.json": {
-    "@agentforge-qa/schemas": "0.2.0",
+    "@agentforge-qa/schemas": "0.3.0",
   },
   "packages/reporters/package.json": {
-    "@agentforge-qa/schemas": "0.2.0",
+    "@agentforge-qa/schemas": "0.3.0",
   },
   "packages/cli/package.json": {
-    "@agentforge-qa/core": "0.2.0",
-    "@agentforge-qa/reporters": "0.2.0",
-    "@agentforge-qa/schemas": "0.2.0",
+    "@agentforge-qa/core": "0.3.0",
+    "@agentforge-qa/reporters": "0.3.0",
+    "@agentforge-qa/schemas": "0.3.0",
   },
 } as const;
 const forbiddenLifecycleScripts = [
@@ -203,7 +203,7 @@ describe("package readiness guardrails", () => {
       const packageDirectory = path.replace("/package.json", "");
 
       expect(manifest.private, `${path} must be publishable later`).not.toBe(true);
-      expect(manifest.version).toBe("0.2.0");
+      expect(manifest.version).toBe("0.3.0");
       expect(manifest.description?.length ?? 0).toBeGreaterThan(20);
       expect(manifest.type).toBe("module");
       expect(manifest.license).toBe("MIT");
@@ -269,7 +269,7 @@ describe("package readiness guardrails", () => {
     const manifest = await readManifest("packages/cli/package.json");
 
     expect(manifest.name).toBe("agentforge-qa");
-    expect(manifest.version).toBe("0.2.0");
+    expect(manifest.version).toBe("0.3.0");
     expect(manifest.description).toBe(
       "Local-first CLI for verifying AI coding-agent work.",
     );
@@ -288,9 +288,9 @@ describe("package readiness guardrails", () => {
     expect(manifest.devDependencies ?? {}).toEqual({});
     expect(manifest.peerDependencies ?? {}).toEqual({});
     expect(manifest.dependencies).toEqual({
-      "@agentforge-qa/core": "0.2.0",
-      "@agentforge-qa/reporters": "0.2.0",
-      "@agentforge-qa/schemas": "0.2.0",
+      "@agentforge-qa/core": "0.3.0",
+      "@agentforge-qa/reporters": "0.3.0",
+      "@agentforge-qa/schemas": "0.3.0",
     });
   });
 
@@ -331,8 +331,8 @@ describe("package readiness guardrails", () => {
 
     expect(manifest.pnpm?.ignoredBuiltDependencies).toEqual(["esbuild"]);
     expect(manifest.pnpm?.overrides).toEqual({
-      "brace-expansion@<1.1.18": "1.1.18",
-      "brace-expansion@>=3.0.0 <5.0.9": "5.0.9",
+      "brace-expansion@<1.1.21": "1.1.21",
+      "brace-expansion@>=3.0.0 <5.0.12": "5.0.12",
       esbuild: "0.28.1",
       "js-yaml@>=4.0.0 <4.3.2": "4.3.2",
       "nanoid@<3.3.18": "3.3.18",
