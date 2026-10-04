@@ -32,7 +32,7 @@ behavior yet.
 
 ## Changed-Work Scanning
 
-The 0.3.0 development pipeline runs the failure suppression scanner immediately
+The 0.3.0 pipeline runs the failure suppression scanner immediately
 after Git collection and before risk assessment. Core's internal scanner result
 contains completion status, normalized signals, file counts, and a summary.
 It is not a new public report field. Separate risk policy maps signals into

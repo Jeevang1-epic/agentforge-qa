@@ -125,7 +125,7 @@ boundary, hosted API, or network client in the current product runtime. Web
 classes such as CSRF, XSS, SSRF, tenant isolation, and session fixation are
 therefore not applicable unless future features introduce those surfaces.
 
-### Failure suppression scanner (0.3.0 development)
+### Failure suppression scanner (0.3.0)
 
 Source contents, changed filenames, diff hunks, and commit messages are
 attacker-controlled. The scanner never imports, evaluates, executes, or sends

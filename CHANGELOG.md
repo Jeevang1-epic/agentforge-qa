@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 - Unreleased
+## 0.3.0 - 2026-10-04
 
 - Added automatic, local failure-suppression evidence for changed JavaScript,
   TypeScript, JSX, TSX, Python, and eligible untracked source.
@@ -10,7 +10,7 @@
   review verdicts without changing the 0.1.0 configuration/report schema.
 - Bounded source and Git input, preserved repository containment, and kept
   scanner source/message capture in memory.
-- Prepared the four runtime packages and their internal dependencies for 0.3.0.
+- Released the four runtime packages at 0.3.0 with aligned internal dependencies.
 
 ## 0.2.0 - 2026-08-03
 

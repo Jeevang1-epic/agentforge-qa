@@ -28,14 +28,21 @@ Install it as a development dependency:
 npm install --save-dev agentforge-qa
 ```
 
-The current public release is `agentforge-qa@0.2.0`.
+The current public release is `agentforge-qa@0.3.0`.
 
-The development workspace is preparing `0.3.0`; the scanner described below is
-not included in the published `0.2.0` package.
+Try the published CLI:
 
-## Failure Suppression Scanner (Development)
+```bash
+npx --yes agentforge-qa@0.3.0 --version
+npx --yes agentforge-qa@0.3.0 verify . --summary-only --exit-zero
+```
 
-The upcoming `0.3.0` CLI automatically checks changed work for possible silent
+The verify command reports evidence for the current directory; `--exit-zero`
+changes only the process exit code, not the report verdict.
+
+## Failure Suppression Scanner
+
+The `0.3.0` CLI automatically checks changed work for possible silent
 failure handling. It examines changed handlers in JavaScript, TypeScript, JSX,
 TSX, and Python, plus eligible untracked source files. With `--since <ref>`,
 it compares the working tree against that safe reference and checks commit
@@ -331,8 +338,7 @@ limitations. Full JSON retains the same validated data as structured fields.
 
 The repository includes deterministic unit, integration, end-to-end,
 package-boundary, package-readiness, and external-consumer validation. The
-`0.2.0` package set was also checked through local npm tarballs as part of
-release validation.
+`0.3.0` package set passed local npm pack dry-runs as part of release validation.
 
 ## Current Scope and Limitations
 
